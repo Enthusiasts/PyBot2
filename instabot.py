@@ -26,7 +26,7 @@ button = driver.find_element_by_class_name('-cx-PRIVATE-LoginForm__loginButton')
 button.click()
 driver.implicitly_wait(10)
 
-tags = ['#me', '#surf', '#longboard', '#skate', '#skateboard']
+tags = ['#skate', '#surf', '#longboard', '#me', '#skateboard']
 
 for tag in tags:
     # поиск по хештегам
@@ -39,30 +39,57 @@ for tag in tags:
     driver.implicitly_wait(10)
 
     #открытие лайк и закрытие 5-15 фото
+
     link = driver.find_elements_by_class_name('-cx-PRIVATE-PostsGrid__item')
+    link[0].click()   #открытие фоточки
+    driver.implicitly_wait(10)
     i=0
     while i<(random.randint(5,15)):
-        link[i].click()
-        i += 1
-        # если хотите лайки раскоменьте следующие 3 строки
-        # like = driver.find_element_by_class_name('-cx-PRIVATE-PostInfo__likeButton')
-        # like.click()
-        # hash = driver.find_element_by_class_name('-cx-PRIVATE-PostInfo__comment')
 
-        try:
-            h1 = driver.find_element_by_class_name('-cx-PRIVATE-PostInfo__comment').text
-            hashTags = re.findall(r'[#]\w+', h1)
-            k=0
-            while (k<len(hashTags)):
-                print(hashTags[k])
-                if ((hashTags[k] not in tags)):
-                    tags.append(hashTags[k])
-                    print(tags)
-                k += 1
-        except:
-            pass
-        closeButton = driver.find_element_by_class_name('-cx-PRIVATE-Modal__closeButton')
-        closeButton.click()
+        # открытие страницы человека
+        person = driver.find_element_by_class_name('-cx-PRIVATE-Post__ownerUserLink')
+        person.click()
+        driver.implicitly_wait(10)
+        time.sleep(5)
+
+        # определение количества лайков которые будут поставлены человеку
+        personPhotoLink = driver.find_elements_by_class_name('-cx-PRIVATE-Photo__root')
+        print(personPhotoLink)
+        maxLikes = random.randint(3,len(personPhotoLink))
+        print(maxLikes)
+        print('___outOfWhile___')
+
+        it = 0
+        while (it < maxLikes):
+
+            # пытаемся открыть фото
+            personPhotoLink[it].click()
+
+            # если хотите лайки раскоменьте следующие 2 строки
+            like = driver.find_element_by_class_name('-cx-PRIVATE-PostInfo__likeButton')
+            like.click()
+            try:
+                h1 = driver.find_element_by_class_name('-cx-PRIVATE-PostInfo__comment').text
+                hashTags = re.findall(r'[#]\w+', h1)
+                k=0
+                max=3
+                if (max > len(hashTags)):
+                    max = len(hashTags)
+                while (k<max):
+                    # print(hashTags[k])
+                    if ((hashTags[k] not in tags)):
+                        tags.append(hashTags[k])
+                    k += 1
+            except:
+                pass
+            driver.back()
+            it +=1
+        i += 1
+        driver.back()
+        driver.back()
+        time.sleep(3)
+        link = driver.find_elements_by_class_name('-cx-PRIVATE-PostsGrid__item')
+        link[i].click()
 
     driver.get('https://instagram.com/')
     time.sleep(random.randint(60,100))
